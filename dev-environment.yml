@@ -1,0 +1,17 @@
+name: lume-lcls-cu-inj-nn-dev
+channels:
+  - conda-forge
+dependencies:
+  - click
+  - pydantic # until lume-services registered with conda
+  - lume-model>=1.4 # until lume-services registered with conda
+  - prefect[viz]<2.0
+  - pip 
+  - pip: 
+    - git+https://github.com/jacquelinegarrahan/lume-services.git
+
+  # dev
+  - pre-commit
+  - pytest
+  - pytest-cov
+  - jupyterlab

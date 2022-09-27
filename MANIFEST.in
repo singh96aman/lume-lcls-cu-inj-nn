@@ -1,0 +1,6 @@
+recursive-include lume_lcls_cu_inj_nn/files *
+include environment.yml
+include README.md
+include LICENSE
+include requirements.txt
+include setup.py
