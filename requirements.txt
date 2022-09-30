@@ -1,2 +1,4 @@
 click
 lume-services
+tensorflow
+keras
