@@ -20,7 +20,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           mamba-version: "*"
           channels: conda-forge
-          activate-environment: {{ cookiecutter.project_slug }}-dev
+          activate-environment: lume-lcls-cu-inj-nn-dev
           environment-file: dev-environment.yml
       
       - name: Install matrix python
