@@ -1,45 +1,121 @@
 import copy
 from typing import Dict
+from lume_model.keras import KerasModel
 from lume_model.models import BaseModel
 from lume_model.variables import InputVariable, OutputVariable
 
 from lume_lcls_cu_inj_nn import INPUT_VARIABLES, OUTPUT_VARIABLES
+from lume_lcls_cu_inj_nn.files import MODEL_FILE
+import keras
+
+# to lume-keras
+class ScaleLayer(keras.layers.Layer):
+    
+    trainable = False
+    
+    def __init__(self, offset, scale, lower,upper, **kwargs): 
+        super(ScaleLayer, self).__init__(**kwargs) 
+        self.scale = scale
+        self.offset = offset
+        self.lower = lower
+        self.upper = upper
+        
+    def call(self, inputs):
+        return self.lower+((inputs-self.offset)*(self.upper-self.lower)/self.scale)
+    
+    
+    # MUST OVERRIDE IN ORDER TO SAVE + LOAD W/KERAS
+    # STORE SALE, etc.
+    def get_config(self):
+        return {'scale': self.scale,'offset': self.offset,'lower': self.lower,'upper': self.upper}
+
+# to lume-keras
+class UnScaleLayer(keras.layers.Layer):
+    
+    trainable = False
+    
+    def __init__(self, offset, scale, lower,upper, **kwargs): 
+        super(UnScaleLayer, self).__init__(**kwargs) 
+        self.scale = scale
+        self.offset = offset
+        self.lower = lower
+        self.upper = upper
+        
+    def call(self, inputs):
+        return (((inputs-self.lower)*self.scale)/(self.upper-self.lower)) + self.offset
+    
+    
+    # MUST OVERRIDE IN ORDER TO SAVE + LOAD W/KERAS
+    # STORE SALE, etc.
+    def get_config(self):
+        return {'scale': self.scale,'offset': self.offset,'lower': self.lower,'upper': self.upper}
+
+# To lume-keras
+class UnScaleImg(keras.layers.Layer):
+    
+    trainable = False
+    
+    def __init__(self, img_offset, img_scale, **kwargs): 
+        super(UnScaleImg, self).__init__(**kwargs) 
+        self.img_scale = img_scale
+        self.img_offset = img_offset
+        
+    def call(self, inputs):
+        return (inputs+self.img_offset)*self.img_scale  
+    
+    
+    # MUST OVERRIDE IN ORDER TO SAVE + LOAD W/KERAS
+    # STORE SALE, etc.
+    def get_config(self):
+        return {'img_scale': self.img_scale,'img_offset': self.img_offset}
 
 
-
-class LumeLclsCuInjNn(BaseModel):
-    input_variables = copy.deepcopy(INPUT_VARIABLES)
-    output_variables = copy.deepcopy(OUTPUT_VARIABLES)
-
-    def __init__(self, **settings_kwargs):
+class LCLSCuInjNN(KerasModel):
+        
+    def __init__(self):
         """Initialize the model. If additional settings are required, they can be 
         passed and handled here. For models that are wrapping model loads
         from other frameworks, this can be used for loading weights, referencing
         data files, etc.
         
         """
-        super().__init__()
+        super().__init__(
+            model_file = MODEL_FILE,
+            input_variables = INPUT_VARIABLES,
+            output_variables = OUTPUT_VARIABLES,
+            custom_layers={"ScaleLayer": ScaleLayer, "UnScaleLayer": UnScaleLayer, "UnScaleImg": UnScaleImg}
+        )
 
-        # handle settings if any
-        # if settings_kwargs is not None:
-        # ...
+    # EVALUATE implemented on KerasModel base class
 
-    def evaluate(
-        self, input_variables: Dict[str, InputVariable]
-    ) -> Dict[str, OutputVariable]:
-        """The evaluate method accepts input variables, performs the model execution,
-        then returns a dictionary mapping variable name to output variable.
+    def format_input(self, input_dictionary):
+        scalar_inputs = np.array([
+            input_dictionary['distgen:r_dist:sigma_xy:value'],
+            input_dictionary['distgen:t_dist:length:value'],
+            input_dictionary['distgen:total_charge:value'],
+            input_dictionary['SOL1:solenoid_field_scale'],
+            input_dictionary['CQ01:b1_gradient'],
+            input_dictionary['SQ01:b1_gradient'],
+            input_dictionary['L0A_phase:dtheta0_deg'],
+            input_dictionary['L0A_scale:voltage'],
+            input_dictionary['end_mean_z']
+            ]).reshape((1,9))
 
-        Args:
-            input_variables (Dict[str, InputVariable]): Dictionary of LUME-model input
-                variables with values assigned.
 
-        Returns:
-            Dict[str, OutputVariable]: Dictionary of LUME-model output variables with
-                values assigned.
+        model_input = [scalar_inputs]
+        return  model_input
 
-        """
 
-        ...
+    def parse_output(self, model_output):        
+        parsed_output = {}
+        parsed_output["x:y"] = model_output[0][0].reshape((50,50))
 
-        return self.output_variables
+        # NTND array attributes MUST BE FLOAT 64!!!! np.float() should be moved to lume-epics
+        parsed_output["out_xmin"] = np.float64(model_output[1][0][0])
+        parsed_output["out_xmax"] = np.float64(model_output[1][0][1])
+        parsed_output["out_ymin"] = np.float64(model_output[1][0][2])
+        parsed_output["out_ymax"] = np.float64(model_output[1][0][3])
+
+        parsed_output.update(dict(zip(self.output_variables.keys(), model_output[2][0].T)))
+
+        return parsed_output
