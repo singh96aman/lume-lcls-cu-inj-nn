@@ -10,6 +10,7 @@ dependencies:
   - prefect[viz]<2.0
   - tensorflow
   - keras
+  - pyepics
   - pip 
   - pip: 
     - git+https://github.com/slaclab/lume-services.git@v0.1.1
