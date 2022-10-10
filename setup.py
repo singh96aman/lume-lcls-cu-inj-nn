@@ -22,7 +22,7 @@ setup(
     entry_points={
         "orchestration": [
             "lume_lcls_cu_inj_nn.model=\
-                lume_lcls_cu_inj_nn.model:LumeLclsCuInjNn",
+                lume_lcls_cu_inj_nn.model:LCLSCuInjNN",
             "lume_lcls_cu_inj_nn.flow=\
                 lume_lcls_cu_inj_nn.flow:flow",
         ]
