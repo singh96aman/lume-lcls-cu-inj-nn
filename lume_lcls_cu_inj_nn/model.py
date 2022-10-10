@@ -7,6 +7,7 @@ from lume_model.variables import InputVariable, OutputVariable
 from lume_lcls_cu_inj_nn import INPUT_VARIABLES, OUTPUT_VARIABLES
 from lume_lcls_cu_inj_nn.files import MODEL_FILE
 import keras
+import numpy as np
 
 # to lume-keras
 class ScaleLayer(keras.layers.Layer):

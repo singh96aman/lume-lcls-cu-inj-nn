@@ -73,7 +73,10 @@ def format_result(
 ):
 
     inputs = {var_name: var.value for var_name, var in input_variables.items()}
-    outputs = {var_name: var.value for var_name, var in output_variables.items()}
+    outputs = {var_name: var.value.astype('float64') for var_name, var in output_variables.items()}
+
+    # convert array to list
+    outputs["x:y"] = outputs["x:y"].tolist()
 
     return Result(inputs=inputs, outputs=outputs)
 
@@ -81,22 +84,9 @@ def format_result(
 @task(log_stdout=True)
 def evaluate(formatted_input_vars):
 
-    settings = {
-        "distgen:t_dist:length:value":formatted_input_vars.pop("distgen:t_dist:length:value").value,
-        "end_mean_z": formatted_input_vars.pop("end_mean_z").value
-    }
+    model = LCLSCuInjNN()
 
-    model = LCLSCuInjNN(**settings)
-
-    output_variables = model.evaluate(list(input_variables.values()))
-
-    results = {
-        var.name: var.value.astype('float64') for var in output_variables
-    }
-
-    results["x:y"] = results["x:y"].tolist()
-
-    return model.evaluate(formatted_input_vars)
+    return model.evaluate(list(formatted_input_vars.values()))
 
 save_db_result_task = SaveDBResult(timeout=30)
 
