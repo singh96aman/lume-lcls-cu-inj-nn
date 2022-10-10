@@ -63,9 +63,6 @@ def preprocessing_task(input_variables):
 
             var.value = scaled_val
 
-        else:
-            var.value = value
-
     return input_variables
 
 
