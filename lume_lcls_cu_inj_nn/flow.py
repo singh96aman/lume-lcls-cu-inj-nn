@@ -86,7 +86,7 @@ def evaluate(formatted_input_vars):
 
     model = LCLSCuInjNN()
 
-    return model.evaluate(list(formatted_input_vars.values()))
+    return model.evaluate(formatted_input_vars)
 
 save_db_result_task = SaveDBResult(timeout=30)
 
