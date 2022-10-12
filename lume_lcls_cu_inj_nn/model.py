@@ -84,11 +84,11 @@ class LCLSCuInjNN(KerasModel):
             model_file = MODEL_FILE,
             input_variables = INPUT_VARIABLES,
             output_variables = OUTPUT_VARIABLES,
-            custom_layers={"ScaleLayer": ScaleLayer, "UnScaleLayer": UnScaleLayer, "UnScaleImg": UnScaleImg}
+            custom_layers={"ScaleLayer": ScaleLayer, "UnScaleLayer": UnScaleLayer, "UnScaleImg": UnScaleImg},
+            output_format = {"type": "softmax"}
         )
 
     # EVALUATE implemented on KerasModel base class
-
     def format_input(self, input_dictionary):
         scalar_inputs = np.array([
             input_dictionary['distgen:r_dist:sigma_xy:value'],
