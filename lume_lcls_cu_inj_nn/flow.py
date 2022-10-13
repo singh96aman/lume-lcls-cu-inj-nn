@@ -99,6 +99,7 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     # CHECK WHETHER THE FLOW IS RUNNING LOCALLY
     # If the flow runs using a local backend, the results service will not be available
     running_local = check_local_execution()
+    running_local.set_upstream(configure)
 
     input_variable_parameter_dict = {
         var_name: Parameter(var_name, default=var.default)
