@@ -7,12 +7,13 @@ dependencies:
   - graphviz
   - python-graphviz
   - prefect[viz]<2.0
+  - docker-py>=5.0  # until lume-services registered with conda
   - tensorflow
   - keras
   - pyepics
+  - lume-model>=1.4.6
   - pip 
-  - pip: 
-    - git+https://github.com/slaclab/lume-model.git@master
+  - pip:
     - git+https://github.com/slaclab/lume-services.git@main
 
   # dev
