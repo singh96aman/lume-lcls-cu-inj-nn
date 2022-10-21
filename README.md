@@ -139,7 +139,7 @@ This README was automatically generated using the template defined in https://gi
     "author": "Jacqueline Garrahan",
     "email": "jacquelinegarrahan@gmail.com",
     "github_username": "jacquelinegarrahan",
-    "github_url": "https://github.com/jacquelinegarrahan/lume-lcls-cu-inj-nn",
+    "github_url": "https://github.com/slaclab/lume-lcls-cu-inj-nn",
     "project_name": "LUME LCLS cu inj nn", 
     "project_slug": "lume-lcls-cu-inj-nn", 
     "package": "lume_lcls_cu_inj_nn",

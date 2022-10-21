@@ -16,7 +16,7 @@ setup(
     packages=find_packages(),
     #  license="...",
     install_requires=requirements,
-    url="https://github.com/jacquelinegarrahan/lume-lcls-cu-inj-nn",
+    url="https://github.com/slaclab/lume-lcls-cu-inj-nn",
     include_package_data=True,
     python_requires=">=3.8",
     entry_points={
