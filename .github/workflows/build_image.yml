@@ -15,17 +15,17 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-     # 
-     # - name: Log in to SCR
-     #   run: |
-     #     echo ${{ secrets.SCR_PAT }} | docker login --username ${{ secrets.STANFORD_USERNAME }} --password-stdin http://scr.svc.stanford.edu
+      
+      - name: Log in to SCR
+        run: |
+          echo glpat-1byzC2YHJ8-N8HCyHpBN | docker login --username aman96 --password-stdin http://scr.svc.stanford.edu
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           registry: scr.svc.stanford.edu
-          username: ${{  secrets.STANFORD_USERNAME }}
-          password: ${{ secrets.SCR_PAT }}
+          username: aman96
+          password: glpat-1byzC2YHJ8-N8HCyHpBN
 
       - name: Build image
         run: |
@@ -33,8 +33,13 @@ jobs:
       
       - name: Tag images
         run: |
-          docker tag ${{ env.REPO }} scr.svc.stanford.edu/${{ secrets.STANFORD_USERNAME }}/${{ env.REPO }}:latest
-          docker tag ${{ env.REPO }} scr.svc.stanford.edu/${{ secrets.STANFORD_USERNAME }}/${{ env.REPO }}:${{ github.ref_name }}
+          docker tag ${{ env.REPO }} scr.svc.stanford.edu/aman96/${{ env.REPO }}:latest
+          docker tag ${{ env.REPO }} scr.svc.stanford.edu/aman96/${{ env.REPO }}:${{ github.ref_name }}
+
+      - name: Push image
+        run: |
+          docker image push scr.svc.stanford.edu/aman96/${{ env.REPO }}:latest
+          docker image push scr.svc.stanford.edu/aman96/${{ env.REPO }}:${{ github.ref_name }}
 
       - name: Push image
         run: |
