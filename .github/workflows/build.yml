@@ -9,6 +9,9 @@ jobs:
   build-sdist:
     runs-on: ubuntu-latest
     permissions:
+      actions: read
+      contents: read
+      security-events: write
       deployments: write
     steps:
     - uses: actions/checkout@v3
@@ -25,7 +28,7 @@ jobs:
     - name: Upload artifact to release
       uses: svenstaro/upload-release-action@v2
       with:
-        #repo_token: glpat-1byzC2YHJ8-N8HCyHpBN
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ steps.sdist.outputs.filename }}
         tag: ${{ github.ref }}
       
