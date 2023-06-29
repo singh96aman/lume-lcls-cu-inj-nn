@@ -18,14 +18,14 @@ jobs:
       
       - name: Log in to SCR
         run: |
-          echo glpat-1byzC2YHJ8-N8HCyHpBN | docker login --username aman96 --password-stdin http://scr.svc.stanford.edu
+          echo glpat-kKUxcn7zhEoBa_37sKoS | docker login --username aman96 --password-stdin http://scr.svc.stanford.edu
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           registry: scr.svc.stanford.edu
           username: aman96
-          password: glpat-1byzC2YHJ8-N8HCyHpBN
+          password: glpat-kKUxcn7zhEoBa_37sKoS
 
       - name: Build image
         run: |
