@@ -8,6 +8,8 @@ on:
 jobs:
   build-sdist:
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
