@@ -40,9 +40,3 @@ jobs:
         run: |
           docker image push scr.svc.stanford.edu/aman96/${{ env.REPO }}:latest
           docker image push scr.svc.stanford.edu/aman96/${{ env.REPO }}:${{ github.ref_name }}
-
-      - name: Push image
-        run: |
-          docker image push scr.svc.stanford.edu/${{ secrets.STANFORD_USERNAME }}/${{ env.REPO }}:latest
-          docker image push scr.svc.stanford.edu/${{ secrets.STANFORD_USERNAME }}/${{ env.REPO }}:${{ github.ref_name }}
-
