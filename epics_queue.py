@@ -46,6 +46,7 @@ def main(model_id, deployment_id, distgen_tdist_length_value, end_mean_z):
     for pvname in PVNAME_TO_INPUT_MAP.keys():
         pvs[pvname] = PV(pvname, auto_monitor=dbr.DBE_VALUE)
         pvs[pvname].add_callback(partial(monitor_callback, parameter_values))
+    
 
     try:
         while True:
@@ -56,9 +57,10 @@ def main(model_id, deployment_id, distgen_tdist_length_value, end_mean_z):
             if not any([parameter_val is None for parameter_val in parameter_values.values()]):
 
                 # blocking call
-                model.run_and_return(
+                model.run(
                     parameters = parameter_values
                 )
+                #exit(1)
     except KeyboardInterrupt:
         for pv in pvs.values():
             pv.clear_auto_monitor()
