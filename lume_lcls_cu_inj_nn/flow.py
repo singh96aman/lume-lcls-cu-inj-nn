@@ -28,8 +28,7 @@ def model_predict(input_variables, settings):
     for setting, value in settings.items():
         input_variables[setting].value = value
 
-    #Test
-    #model = LCLSCuInjNN()
+    model = LCLSCuInjNN()
 
     output_variables = model.evaluate(list(input_variables.values()))
 
@@ -77,8 +76,7 @@ def format_result(
     outputs = {var_name: var.value.astype('float64') for var_name, var in output_variables.items()}
 
     # convert array to list
-    #Test
-    #outputs["x:y"] = outputs["x:y"].tolist()
+    outputs["x:y"] = outputs["x:y"].tolist()
 
     return Result(inputs=inputs, outputs=outputs)
 
@@ -86,8 +84,7 @@ def format_result(
 @task(log_stdout=True)
 def evaluate(formatted_input_vars):
 
-    #Test
-    #model = LCLSCuInjNN()
+    model = LCLSCuInjNN()
 
     return model.evaluate(formatted_input_vars)
 
