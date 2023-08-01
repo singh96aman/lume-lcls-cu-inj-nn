@@ -6,7 +6,7 @@ RUN conda install -c conda-forge conda-pack && \
   conda env create -f /lume-lcls-cu-inj-nn/environment.yml
 
 # Use conda-pack to create a  enviornment in /venv:
-RUN conda-pack -n lume-lcls-cu-inj-nn-torch -o /tmp/env.tar && \
+RUN conda-pack -n lume-lcls-cu-inj-nn -o /tmp/env.tar && \
   mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
   rm /tmp/env.tar
 

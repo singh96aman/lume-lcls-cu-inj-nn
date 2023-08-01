@@ -1,4 +1,4 @@
-name: lume-lcls-cu-inj-nn-torch
+name: lume-lcls-cu-inj-nn
 channels:
   - pytorch
   - conda-forge
