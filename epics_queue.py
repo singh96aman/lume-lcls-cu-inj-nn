@@ -56,7 +56,7 @@ def main(model_id, deployment_id, distgen_tdist_length_value, end_mean_z):
             if not any([parameter_val is None for parameter_val in parameter_values.values()]):
 
                 # blocking call
-                model.run_and_return(
+                model.run(
                     parameters = parameter_values
                 )
     except KeyboardInterrupt:
