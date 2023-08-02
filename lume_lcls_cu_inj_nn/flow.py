@@ -79,7 +79,7 @@ def format_result(
 ):
     print('Hey 5')
     output_symbols = ["sigma_x", "sigma_y", "sigma_z", "norm_emit_x", "norm_emit_y"]
-    inputs = {var_name: var.value for var_name, var in input_variables.items()}
+    #inputs = {var_name: var.value for var_name, var in input_variables.items()}
     outputs = {}
     output_variables = output_variables.tolist()
 
@@ -90,10 +90,10 @@ def format_result(
     # convert array to list
     #outputs["x:y"] = outputs["x:y"].tolist()
 
-    print('Final Result')
-    print(Result(inputs=inputs, outputs=outputs))
+    print('Final Result2')
+    print(outputs)
 
-    return Result(inputs=inputs, outputs=outputs)
+    return Result(inputs=input_variables, outputs=outputs)
 
 
 @task(log_stdout=True)
@@ -102,7 +102,7 @@ def evaluate(formatted_input_vars):
     print('Hey 3')
     all_input_values = []
     for key in formatted_input_vars:
-        all_input_values.append(formatted_input_vars[key].value)
+        all_input_values.append(formatted_input_vars[key])
 
     all_input_values = torch.Tensor([all_input_values])
     
@@ -133,15 +133,24 @@ def evaluate(formatted_input_vars):
         output_order=lume_model.outputs,
     )
 
+    print('Input Predictions')
+    print(all_input_values)
+
     with torch.no_grad():
         predictions = lume_module(all_input_values)
 
-    print('Hey 4')
+    print('PREDICTIONS!!!')
     print(predictions)
 
     return predictions
 
 save_db_result_task = SaveDBResult(timeout=30)
+
+@task(log_stdout=True)
+def load_input(var_name, parameter):
+    print('Loaded ', str(var_name), ' with value - ', parameter)
+    return parameter
+    
 
 with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
 
@@ -156,30 +165,32 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     running_local = check_local_execution()
     running_local.set_upstream(configure)
 
-    input_variable_parameter_dict = {
-        var_name: Parameter(var_name, default=var.default)
-        for var_name, var in INPUT_VARIABLES.items()
-    }
+    input_variable_parameter_dict = {}
+    
+    for var_name, var in INPUT_VARIABLES.items():
+        input_variable_parameter_dict[var_name] = load_input(var_name, Parameter(var_name, default=var.default))
 
-    # ORGANIZE INPUT VARIABLE VALUES LUME-MODEL VARIABLES
-    formatted_input_vars = prepare_lume_model_variables(
-        input_variable_parameter_dict, INPUT_VARIABLES
-    )
+    
+    # # ORGANIZE INPUT VARIABLE VALUES LUME-MODEL VARIABLES
+    # formatted_input_vars = prepare_lume_model_variables(
+    #     input_variable_parameter_dict, INPUT_VARIABLES
+    # )
 
-    print('Hey1')
-    print(formatted_input_vars)
+    # print('Hey1')
+    # print(formatted_input_vars)
 
     # Perform scaling of variables
-    processed_input_vars = preprocessing_task(formatted_input_vars)
+    # processed_input_vars = preprocessing_task(formatted_input_vars)
     
     # RUN EVALUATION
-    output_variables = evaluate(processed_input_vars)
+    # output_variables = evaluate(processed_input_vars)
+    output_variables = evaluate(input_variable_parameter_dict)
 
     # SAVE RESULTS TO RESULTS DATABASE, requires LUME-services results backend 
     with case(running_local, False):
         # CREATE LUME-services Result object
         formatted_result = format_result(
-            input_variables=processed_input_vars, output_variables=output_variables
+            input_variables=input_variable_parameter_dict, output_variables=output_variables
         )
 
         # RUN DATABASE_SAVE_TASK

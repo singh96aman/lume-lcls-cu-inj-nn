@@ -18,6 +18,17 @@ PVNAME_TO_INPUT_MAP = {
     "IRIS:LR20:130:CONFG_SEL": "distgen:r_dist:sigma_xy:value"
 }
 
+PVNAME_TO_INPUT_MAP_TORCH = {
+    "ACCL:IN20:300:L0A_ADES": "L0A_scale:voltage",
+    "ACCL:IN20:400:L0B_PDES": "L0B_phase:dtheta0_deg",
+    "ACCL:IN20:300:L0A_PDES": "L0A_phase:dtheta0_deg",
+    "QUAD:IN20:122:BACT": "SQ01:b1_gradient",
+    "QUAD:IN20:121:BACT": "CQ01:b1_gradient",
+    "SOLN:IN20:121:BACT": "SOL1:solenoid_field_scale",
+    "BPMS:IN20:221:TMIT": "distgen:total_charge:value",
+    "IRIS:LR20:130:CONFG_SEL": "distgen:r_dist:sigma_xy:value"
+}
+
 def monitor_callback(parameter_values, pvname, value, **kwargs):
     parameter_values[pvname] = value
 
