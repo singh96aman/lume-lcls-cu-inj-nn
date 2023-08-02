@@ -107,14 +107,16 @@ def evaluate(formatted_input_vars):
     all_input_values = torch.Tensor([all_input_values])
     
     #model = LCLSCuInjNN()
+    import os
+    print(os.listdir())
     
-    input_transformer = torch.load("lume_lcls_cu_inj_nn/model/input_transformer.pt")
-    output_transformer = torch.load("lume_lcls_cu_inj_nn/model/output_transformer.pt")
-    input_variables, output_variables = variables_from_yaml(open("lume_lcls_cu_inj_nn/model/variables.yml"))
+    input_transformer = torch.load("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/input_transformer.pt")
+    output_transformer = torch.load("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/output_transformer.pt")
+    input_variables, output_variables = variables_from_yaml(open("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/variables.yml"))
 
     # create lume model
     lume_model = PyTorchModel(
-        model_file="lume_lcls_cu_inj_nn/model/model.pt",
+        model_file="/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/model.pt",
         input_variables=input_variables,
         output_variables=output_variables,
         input_transformers=[input_transformer],
