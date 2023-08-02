@@ -109,14 +109,19 @@ def evaluate(formatted_input_vars):
     #model = LCLSCuInjNN()
     import os
     print(os.listdir())
+
+    if os.path.exists('model/'):
+        TORCH_MODEL_PATH = 'model/'
+    else:
+        TORCH_MODEL_PATH = '/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/'
     
-    input_transformer = torch.load("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/input_transformer.pt")
-    output_transformer = torch.load("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/output_transformer.pt")
-    input_variables, output_variables = variables_from_yaml(open("/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/variables.yml"))
+    input_transformer = torch.load(TORCH_MODEL_PATH+"input_transformer.pt")
+    output_transformer = torch.load(TORCH_MODEL_PATH+"output_transformer.pt")
+    input_variables, output_variables = variables_from_yaml(open(TORCH_MODEL_PATH+"variables.yml"))
 
     # create lume model
     lume_model = PyTorchModel(
-        model_file="/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/model.pt",
+        model_file=TORCH_MODEL_PATH+"model.pt",
         input_variables=input_variables,
         output_variables=output_variables,
         input_transformers=[input_transformer],
