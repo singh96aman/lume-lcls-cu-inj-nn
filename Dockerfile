@@ -38,6 +38,6 @@ RUN source /venv/bin/activate && \
 
 # When image is run, run the code with the environment
 # activated:
-SHELL ["/usr/local/bin/_entrypoint.sh", "/bin/bash", "-c"]
+#SHELL ["/usr/local/bin/_entrypoint.sh", "/bin/bash", "-c"]
 
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+#ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
