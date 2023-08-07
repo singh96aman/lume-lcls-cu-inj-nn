@@ -6,7 +6,16 @@ dependencies:
   - docker-py>=5.0  # until lume-services registered with conda
   - tensorflow
   - keras
-  - lume-model>=1.4.6
+  - lume-model>=1.6.0
+  - pydantic==1.10.9
+  - botorch>=0.8.2
+  - ipywidgets
+  - tqdm
+  - matplotlib
+  - jupyterlab
+  - ipykernel
+  - jupyter
+  - nb_conda_kernels
   - pip 
   - pip: 
     - git+https://github.com/slaclab/lume-services.git@main
