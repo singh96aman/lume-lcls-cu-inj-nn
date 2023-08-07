@@ -36,6 +36,8 @@ RUN chmod +x /usr/local/bin/_entrypoint.sh
 RUN source /venv/bin/activate && \
   python -m pip install /lume-lcls-cu-inj-nn
 
+RUN echo 'source /venv/bin/activate' >> $HOME/.bashrc
+
 # When image is run, run the code with the environment
 # activated:
 SHELL ["/usr/local/bin/_entrypoint.sh", "/bin/bash", "-c"]
