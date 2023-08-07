@@ -18,4 +18,4 @@ dependencies:
   - nb_conda_kernels
   - pip 
   - pip: 
-    - git+https://github.com/slaclab/lume-services.git@main
+    - git+https://github.com/singh96aman/lume-services.git@main
