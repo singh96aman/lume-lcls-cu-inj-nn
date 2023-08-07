@@ -20,6 +20,11 @@ from prefect.storage import Module
 from lume_lcls_cu_inj_nn.model import LCLSCuInjNN
 from lume_lcls_cu_inj_nn import INPUT_VARIABLES, CU_INJ_MAPPING_TABLE
 
+import torch
+import matplotlib.pyplot as plt
+
+from lume_model.utils import variables_from_yaml
+from lume_model.torch import LUMEModule, PyTorchModel
 
 @task(log_stdout=True)
 def model_predict(input_variables, settings):
@@ -62,36 +67,95 @@ def preprocessing_task(input_variables):
             )
 
             var.value = scaled_val
-
+    print('Hey2')
+    print(input_variables)
     return input_variables
 
 
 @task(log_stdout=True)
 def format_result(
     input_variables: Dict[str, InputVariable],
-    output_variables: Dict[str, OutputVariable],
+    output_variables,
 ):
+    print('Hey 5')
+    output_symbols = ["sigma_x", "sigma_y", "sigma_z", "norm_emit_x", "norm_emit_y"]
+    #inputs = {var_name: var.value for var_name, var in input_variables.items()}
+    outputs = {}
+    output_variables = output_variables.tolist()
 
-    inputs = {var_name: var.value for var_name, var in input_variables.items()}
-    outputs = {var_name: var.value.astype('float64') for var_name, var in output_variables.items()}
+    
+    for i in range(len(output_variables)):
+        outputs[output_symbols[i]] = output_variables[i]
 
     # convert array to list
-    outputs["x:y"] = outputs["x:y"].tolist()
+    #outputs["x:y"] = outputs["x:y"].tolist()
 
-    return Result(inputs=inputs, outputs=outputs)
+    print('Final Result2')
+    print(outputs)
+
+    return Result(inputs=input_variables, outputs=outputs)
 
 
 @task(log_stdout=True)
 def evaluate(formatted_input_vars):
 
-    model = LCLSCuInjNN()
+    print('Hey 3')
+    all_input_values = []
+    for key in formatted_input_vars:
+        all_input_values.append(formatted_input_vars[key])
 
-    return model.evaluate(formatted_input_vars)
+    all_input_values = torch.Tensor([all_input_values])
+    
+    #model = LCLSCuInjNN()
+    import os
+    print(os.listdir())
+
+    if os.path.exists('model/'):
+        TORCH_MODEL_PATH = 'model/'
+    else:
+        TORCH_MODEL_PATH = '/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/'
+    
+    input_transformer = torch.load(TORCH_MODEL_PATH+"input_transformer.pt")
+    output_transformer = torch.load(TORCH_MODEL_PATH+"output_transformer.pt")
+    input_variables, output_variables = variables_from_yaml(open(TORCH_MODEL_PATH+"variables.yml"))
+
+    # create lume model
+    lume_model = PyTorchModel(
+        model_file=TORCH_MODEL_PATH+"model.pt",
+        input_variables=input_variables,
+        output_variables=output_variables,
+        input_transformers=[input_transformer],
+        output_transformers=[output_transformer],
+    )
+    lume_module = LUMEModule(
+        model=lume_model,
+        feature_order=lume_model.features,
+        output_order=lume_model.outputs,
+    )
+
+    print('Input Predictions')
+    print(all_input_values)
+
+    with torch.no_grad():
+        predictions = lume_module(all_input_values)
+
+    print('PREDICTIONS!!!')
+    print(predictions)
+
+    return predictions
 
 save_db_result_task = SaveDBResult(timeout=30)
 
+@task(log_stdout=True)
+def load_input(var_name, parameter):
+    print('Loaded ', str(var_name), ' with value - ', parameter)
+    return parameter
+    
+
 with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
 
+    print('Inside flow')
+    
     # CONFIGURE LUME-SERVICES
     # see https://slaclab.github.io/lume-services/workflows/#configuring-flows-for-use-with-lume-services
     configure = configure_lume_services()
@@ -101,27 +165,32 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     running_local = check_local_execution()
     running_local.set_upstream(configure)
 
-    input_variable_parameter_dict = {
-        var_name: Parameter(var_name, default=var.default)
-        for var_name, var in INPUT_VARIABLES.items()
-    }
+    input_variable_parameter_dict = {}
+    
+    for var_name, var in INPUT_VARIABLES.items():
+        input_variable_parameter_dict[var_name] = load_input(var_name, Parameter(var_name, default=var.default))
 
-    # ORGANIZE INPUT VARIABLE VALUES LUME-MODEL VARIABLES
-    formatted_input_vars = prepare_lume_model_variables(
-        input_variable_parameter_dict, INPUT_VARIABLES
-    )
+    
+    # # ORGANIZE INPUT VARIABLE VALUES LUME-MODEL VARIABLES
+    # formatted_input_vars = prepare_lume_model_variables(
+    #     input_variable_parameter_dict, INPUT_VARIABLES
+    # )
+
+    # print('Hey1')
+    # print(formatted_input_vars)
 
     # Perform scaling of variables
-    processed_input_vars = preprocessing_task(formatted_input_vars)
-
+    # processed_input_vars = preprocessing_task(formatted_input_vars)
+    
     # RUN EVALUATION
-    output_variables = evaluate(processed_input_vars)
+    # output_variables = evaluate(processed_input_vars)
+    output_variables = evaluate(input_variable_parameter_dict)
 
     # SAVE RESULTS TO RESULTS DATABASE, requires LUME-services results backend 
     with case(running_local, False):
         # CREATE LUME-services Result object
         formatted_result = format_result(
-            input_variables=processed_input_vars, output_variables=output_variables
+            input_variables=input_variable_parameter_dict, output_variables=output_variables
         )
 
         # RUN DATABASE_SAVE_TASK
