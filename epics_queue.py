@@ -13,17 +13,6 @@ import matplotlib.pyplot as plt
 from lume_model.utils import variables_from_yaml
 from lume_model.torch import LUMEModule, PyTorchModel
 
-PVNAME_TO_INPUT_MAP = {
-    "ACCL:IN20:300:L0A_ADES": "L0A_scale:voltage",
-    "ACCL:IN20:400:L0B_PDES": "L0B_phase:dtheta0_deg",
-    "ACCL:IN20:300:L0A_PDES": "L0A_phase:dtheta0_deg",
-    "QUAD:IN20:122:BACT": "SQ01:b1_gradient",
-    "QUAD:IN20:121:BACT": "CQ01:b1_gradient",
-    "SOLN:IN20:121:BACT": "SOL1:solenoid_field_scale",
-    "BPMS:IN20:221:TMIT": "distgen:total_charge:value",
-    "IRIS:LR20:130:CONFG_SEL": "distgen:r_dist:sigma_xy:value"
-}
-
 def monitor_callback(parameter_values, pvname, value, **kwargs):
     parameter_values[pvname] = value
 
@@ -38,7 +27,7 @@ def main(model_id, deployment_id, distgen_tdist_length_value, distgen_total_char
 
     configure()
     
-    PVNAME_TO_INPUT_MAP = json.load(open('info/pv_mapping.json'))['pv_name_to_sim_name']
+    PVNAME_TO_INPUT_MAP = json.load(open('lume_lcls_cu_inj_nn/info/pv_mapping.json'))['pv_name_to_sim_name']
 
     pvs, parameter_values = {}, {}
 
@@ -58,8 +47,9 @@ def main(model_id, deployment_id, distgen_tdist_length_value, distgen_total_char
 
     try:
         while True:
-            time.sleep(60)
+            time.sleep(3)
             print("Evaluating model for:")
+            print(parameter_values)
             # only queue model once all have values
             if not any([parameter_val is None for parameter_val in parameter_values.values()]):
                 print(parameter_values)
