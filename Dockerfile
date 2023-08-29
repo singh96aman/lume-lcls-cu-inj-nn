@@ -15,6 +15,7 @@ FROM debian:buster AS runtime
 
 # provide version from Docker build args
 ARG VERSION
+RUN echo "Version is - $VERSION"
 ENV version=$VERSION
 
 ENV PATH="${PATH}:/venv/bin"
