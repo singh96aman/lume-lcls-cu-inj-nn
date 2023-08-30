@@ -53,7 +53,7 @@ def evaluate(formatted_input_vars, lume_module):
     all_input_values = torch.Tensor([all_input_values])
     with torch.no_grad():
         predictions = lume_module(all_input_values)
-        
+    print('Predictions - ', predictions)  
     return predictions
 
 save_db_result_task = SaveDBResult(timeout=30)
@@ -70,6 +70,7 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     print('Starting Flow Run')
     # CONFIGURE LUME-SERVICES
     # see https://slaclab.github.io/lume-services/workflows/#configuring-flows-for-use-with-lume-services
+    
     configure = configure_lume_services()
 
     # CHECK WHETHER THE FLOW IS RUNNING LOCALLY
