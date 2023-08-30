@@ -129,10 +129,10 @@ conda activate lume-lcls-cu-inj-nn-dev
 python epics_queue.py
 ```
 
-### Running on ARD GPU Box
+## Running on ARD GPU Box
 Please follow/test above all steps before reproducing these here -
 
-## Opening Lume Services
+### Opening Lume Services
 
 1. Open a Double SSH Terminal with 2 Ports for Prefect UI and Server.
 Below example will start Lume Services on localhost:4204 and Prefect UI on localhost:4113
@@ -155,7 +155,7 @@ export SCR_PAT=<your PAT from step 9>
 lume-services docker start-services
 ```
 
-## Opening NN Injector
+### Opening NN Injector
 
 1. Open a Double SSH Terminal with a Port to open Jupyter Notebook.
 Below example will allow you to start a Jupyter notebook on localhost:8990
