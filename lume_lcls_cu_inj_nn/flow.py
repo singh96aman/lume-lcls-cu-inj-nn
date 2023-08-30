@@ -66,7 +66,8 @@ def load_input(var_name, parameter):
     
 
 with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
-    
+
+    print('Starting Flow Run')
     # CONFIGURE LUME-SERVICES
     # see https://slaclab.github.io/lume-services/workflows/#configuring-flows-for-use-with-lume-services
     configure = configure_lume_services()
@@ -81,11 +82,16 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     for var_name, var in INPUT_VARIABLES.items():
         input_variable_parameter_dict[var_name] = load_input(var_name, Parameter(var_name, default=var.default))
 
+    print('Input Variable Parameters - ',input_variable_parameter_dict)
+    
     if os.path.exists('model/'):
         TORCH_MODEL_PATH = 'model/'
     else:
         print(os.listdir())
         TORCH_MODEL_PATH = 'lume_lcls_cu_inj_nn/model/'
+
+    print('Reached Here with TORCH MODEL PATH - ', TORCH_MODEL_PATH)
+    print(print(os.listdir()))
     
     input_transformer = torch.load(TORCH_MODEL_PATH+"input_transformer.pt")
     output_transformer = torch.load(TORCH_MODEL_PATH+"output_transformer.pt")
