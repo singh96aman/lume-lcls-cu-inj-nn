@@ -96,8 +96,8 @@ lume-services docker start-services
 In another window, run the model and deployment registration blocks using the notebook in `examples/Run.ipynb`.
 ```
 conda activate lume-lcls-cu-inj-nn-dev
-source examples/demo.env
-jupyter notebook examples/Run.ipynb
+source demo.env
+jupyter notebook Run.ipynb
 ```
 
 In yet another window, configure the EPICS environment using a port forwarding from prod machines.
@@ -110,7 +110,7 @@ Where `EPICS_CA_NAME_SERVER_PORT` may be any available port, not necessarily 246
 
 ```
 conda activate lume-lcls-cu-inj-nn-dev
-source examples/demo.env
+source demo.env
 python epics_queue.py 1 1
 ```
 Where the first argument `1` corresponds to the registered `model_id` and the second `1` corresponds to the registered `deployment_id`.
@@ -129,7 +129,55 @@ conda activate lume-lcls-cu-inj-nn-dev
 python epics_queue.py
 ```
 
+### Running on ARD GPU Box
+Please follow/test above all steps before reproducing these here -
 
+## Opening Lume Services
+
+1. Open a Double SSH Terminal with 2 Ports for Prefect UI and Server.
+Below example will start Lume Services on localhost:4204 and Prefect UI on localhost:4113
+```
+ssh -L 4113:localhost:8992 -L 4203:localhost:8993 thakur12@centos7.slac.stanford.edu -t ssh -L 8993:localhost:4203 -L 8992:localhost:4112 thakur12@PC101221
+```
+3. Clone Lume Services [Repo](https://github.com/slaclab/lume-services)
+4. Install Lume Services
+```
+pip install git+https://github.com/slaclab/lume-services.git
+```
+4. Run below code to make sure Lume Services has starte. You should get a prompt - All Services have started and are passing health checks.
+```
+cd lume-services/
+conda env create -f dev-environment.yml
+conda activate lume-services-dev
+source docs/examples/demo.env
+export STANFORD_USERNAME=<your_stanford_username>
+export SCR_PAT=<your PAT from step 9>
+lume-services docker start-services
+```
+
+## Opening NN Injector
+
+1. Open a Double SSH Terminal with a Port to open Jupyter Notebook.
+Below example will allow you to start a Jupyter notebook on localhost:8990
+```
+ssh -L 8990:localhost:8991 thakur12@centos7.slac.stanford.edu -t ssh -L 8991:localhost:1234 thakur12@PC101221
+```
+3. Clone NN Injector [Repo](https://github.com/slaclab/lume-lcls-cu-inj-nn)
+4. Follow the same steps as above - Install, Create Environment, Set Env Variables
+```
+cd lume-lcls-cu-inj-nn/
+conda env create-f dev-environment.yml
+conda activate lume-lcls-cu-inj-nn-dev
+source demo.env
+jupyter notebook --no-browser --port=1234
+```
+5. Feel free to run Run.ipynb for a demo run or you can run the service that listens to epics/processes in batch -
+```
+export EPICS_CA_NAME_SERVER_PORT=24800
+ssh -fN -L $EPICS_CA_NAME_SERVER_PORT:lcls-prod01.slac.stanford.edu:5068 thakur12@centos7.slac.stanford.edu
+export EPICS_CA_NAME_SERVERS=localhost:$EPICS_CA_NAME_SERVER_PORT
+python epics_queue.py 1 1
+```
 
 ### Note
 This README was automatically generated using the template defined in https://github.com/slaclab/lume-services-model-template with the following configuration:
