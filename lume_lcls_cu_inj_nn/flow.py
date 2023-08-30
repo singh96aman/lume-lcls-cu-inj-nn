@@ -87,11 +87,13 @@ with Flow("lume-lcls-cu-inj-nn", storage=Module(__name__)) as flow:
     
     if os.path.exists('model/'):
         TORCH_MODEL_PATH = 'model/'
+    elif os.path.exists('/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/'):
+        #This is the Docker Path
+        TORCH_MODEL_PATH = '/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/'
     elif os.path.exists('lume_lcls_cu_inj_nn/model/'):
         TORCH_MODEL_PATH = 'lume_lcls_cu_inj_nn/model/'
     else:
-        #This is the Docker Path as lume-lcls-cu-inj-nn is copied to Root
-        TORCH_MODEL_PATH = '/lume-lcls-cu-inj-nn/lume_lcls_cu_inj_nn/model/'
+        print('Path Not Found')
 
     print('Reached Here with TORCH MODEL PATH - ', TORCH_MODEL_PATH)
     print(print(os.listdir()))
